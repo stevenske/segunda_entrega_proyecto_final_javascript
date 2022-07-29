@@ -3,7 +3,7 @@ let cardsContainer = document.getElementById("cards__container")
 let shoppingContainer = document.getElementById("shopping__container")
 let cartCounter = document.querySelector("#cart__counter")
 let totalContainer = document.getElementById('total__container')
-let shoppingCart = JSON.parse(localStorage.getItem('shoppingTrips'))|| [];
+let shoppingCart = JSON.parse(localStorage.getItem('shoppingTrips')) || [];
 const stockTrips = []
 //------------------------------------------------------------
 
@@ -50,16 +50,17 @@ function showProducts() {
         button.addEventListener("click", () => {
             addCart(item.id)
         })
-        function addCart(id) {
-            let finded = stockTrips.find(e => e.id === id)
-            let exist = shoppingCart.includes(finded)
-            // console.log(finded);
-            if (exist) {
-                finded.quantityProd += 1
-                console.log(shoppingCart)
-            }else{
-                shoppingCart.push(finded)
-                localStorage.setItem('shoppingTrips',JSON.stringify(shoppingCart))
+        function addCart(idArticle) {
+            let finded = stockTrips.find(article => article.id === idArticle)
+            if (finded) {
+                let productInCart = shoppingCart.find((article) => article.id === finded.id)
+                if (productInCart) {
+                    productInCart.quantityProd += 1
+                    localStorage.setItem('shoppingTrips', JSON.stringify(shoppingCart))
+                } else {
+                    shoppingCart.push(new StockTrips(finded.id, finded.trip, finded.price, finded.desc, finded.img, finded.quantityProd))
+                    localStorage.setItem('shoppingTrips', JSON.stringify(shoppingCart))
+                }
             }
             console.log(shoppingCart)
             showShoppingCart()
@@ -94,6 +95,9 @@ function showShoppingCart() {
         showTotal()
     }
 }
+showShoppingCart()
+showTotal()
+
 function updateCart() {
     let quantity = document.querySelectorAll('#shopping__container > div')
     cartCounter.innerText = quantity.length
@@ -105,7 +109,6 @@ function showTotal() {
     totalContainer.className = 'mx-1 my-2 d-flex justify-content-end'
     totalContainer.innerHTML = `Total Price:$${updateTotal()}`
 }
-showTotal()
 
 function updateTotal() {
     let total = 0
@@ -120,13 +123,13 @@ function updateTotal() {
 //REMOVE----------------------------------------------------
 function removeItem(id) {
     for (let i = 0; i < shoppingCart.length; i += 1) {
-        if(shoppingCart[i].quantityProd > 1){
+        if (shoppingCart[i].quantityProd > 1) {
             shoppingCart[i].quantityProd = 1
         }
         if (shoppingCart[i].id === id) {
-                shoppingCart.splice(i, 1)
-                localStorage.removeItem(i)
-                localStorage.setItem('shoppingTrips',JSON.stringify(shoppingCart))
+            shoppingCart.splice(i, 1)
+            localStorage.removeItem(i)
+            localStorage.setItem('shoppingTrips', JSON.stringify(shoppingCart))
             showShoppingCart()
             return
         }
